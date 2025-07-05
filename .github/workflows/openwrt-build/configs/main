@@ -1,0 +1,5 @@
+# Install LuCI
+CONFIG_PACKAGE_luci=y
+
+# Install our Material Design 3 theme for LuCI
+CONFIG_PACKAGE_luci-theme-material3=y
