@@ -1,81 +1,15 @@
 #!/bin/sh
 
 if [ "$PKG_UPGRADE" != 1 ]; then
-
-  # Install our theme variants and make us the default theme
-  uci get luci.themes.Material3 >/dev/null 2>&1 || {
-    uci set luci.themes.Material3=/luci-static/material3
-    uci set luci.themes.Material3Blue=/luci-static/material3-blue
-    uci set luci.themes.Material3Green=/luci-static/material3-green
-    uci set luci.themes.Material3Red=/luci-static/material3-red
-    uci set luci.themes.Material3Amoled=/luci-static/material3-amoled
-    uci set luci.main.mediaurlbase=/luci-static/material3
-    uci commit luci
-  }
-
-  # Cache the Google Sans font to serve from this host
-  download() {
-    url="$1"
-    file="$2"
-    ua="$3"
-    if [ -z "$ua" ]; then
-      ua="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0"
-    fi
-    if [ ! -f "$file" ]; then
-      echo "Downloading $file"
-      wget -q -O "$file" -U "$ua" "$url"
-    fi
-  }
-  INPUT="/tmp/google-sans.css"
-  TMP="/tmp/google-sans.local.css"
-  OUTPUT="/www/luci-static/material3/google-sans.css"
-  FONT_DIR="/www/luci-static/material3/fonts"
-  rm -f "$TMP"
-  mkdir -p "$FONT_DIR"
-  download "https://fonts.googleapis.com/css?family=Google+Sans" "$INPUT"
-  lang=""
-  in_block=0
-  while IFS= read -r line; do
-    case "$line" in
-    "/* "*)
-      lang=$(echo "$line" | sed -n 's|/\*\s*\(.*\)\s*\*/|\1|p' | sed 's/^ *//;s/ *$//')
-      in_block=1
-      echo "$line" >> "$TMP"
-      ;;
-    *"@font-face {"*)
-      echo "$line" >> "$TMP"
-      ;;
-    *"src: url("*)
-      if [ "$in_block" -eq 1 ] && [ -n "$lang" ]; then
-        file=$(echo "$line" | sed -n 's|.*url(.*\/\([^/]*\.woff2\)).*|\1|p')
-        echo "  src: url(\"fonts/$lang.woff2\") format(\"woff2\");" >> "$TMP"
-        url=$(echo "$line" | sed -n 's|.*url(\(https[^)]*\.woff2\)).*|\1|p')
-        download "$url" "$FONT_DIR/$lang.woff2"
-        if [ $? -ne 0 ]; then
-          rm -rf "$FONT_DIR"
-          break
-        fi
-      else
-        echo "$line" >> "$TMP"
-      fi
-      ;;
-    "}")
-      in_block=0
-      echo "$line" >> "$TMP"
-      echo "" >> "$TMP"
-      ;;
-    *)
-      echo "$line" >> "$TMP"
-      ;;
-    esac
-  done < "$INPUT"
-  rm -f "$INPUT"
-  if [ -d "$FONT_DIR" ]; then
-    mv "$TMP" "$OUTPUT"
-  else
-    rm -f "$TMP"
-  fi
-
+	uci get luci.themes.Material3 >/dev/null 2>&1 || {
+		uci set luci.themes.Material3=/luci-static/material3
+		uci set luci.main.mediaurlbase=/luci-static/material3
+		uci set luci.themes.Material3Blue=/luci-static/material3-blue
+		uci set luci.themes.Material3Green=/luci-static/material3-green
+		uci set luci.themes.Material3Red=/luci-static/material3-red
+		uci set luci.themes.Material3Amoled=/luci-static/material3-amoled
+		uci commit luci
+	}
 fi
 
 exit 0
