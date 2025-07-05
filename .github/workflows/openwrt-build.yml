@@ -91,8 +91,9 @@ jobs:
 
       - name: Clean outputs
         run: |
+          set +e
           cd openwrt-builder
-          clearvars
+          . build/envsetup
           clean
           cd ..
 
