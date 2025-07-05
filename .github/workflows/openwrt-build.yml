@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      cache-key: ${{ matrix.version }}-${{ matrix.lunch }}
+      cache-key: ${{ matrix.version }}-${{ matrix.lunch }}-material3
 
     strategy:
       fail-fast: false
@@ -33,7 +33,7 @@ jobs:
         uses: actions/cache/restore@v3
         with:
           path: openwrt-builder
-          key: ${{ env.cache-key }}-material3
+          key: ${{ env.cache-key }}
 
       - name: Check if the OpenWRT builder exists
         id: check
